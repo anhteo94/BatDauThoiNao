@@ -1,5 +1,5 @@
 -- GHI CHÚ: Thay placeholder URL loadstring nếu cần
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/YourUser/KavoUI/main.lua"))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
 local Window = Library.CreateLib("Blox Fruits Enhanced", "Serpent") -- chọn theme
 
 -- Mỗi tab + các toggle
