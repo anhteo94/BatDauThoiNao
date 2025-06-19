@@ -1,133 +1,48 @@
--- PhamNghia Hub – Full Edition
-if not game:IsLoaded() then repeat task.wait() until game:IsLoaded() end
+-- GHI CHÚ: Thay placeholder URL loadstring nếu cần
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/YourUser/KavoUI/main.lua"))()
+local Window = Library.CreateLib("Blox Fruits Enhanced", "Serpent") -- chọn theme
 
-local Library = loadstring(game:HttpGet(
-  "https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"
-))()
-local Window = Library.CreateLib("PhamNghia Hub", "BloodTheme")
-
--- 🔧 Main Tab
-local main = Window:NewTab("Main")
-local msec = main:NewSection("Main")
-msec:NewButton("Rejoin", "Reconnect server", function()
-  game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, game.Players.LocalPlayer)
-end)
-
--- 🔄 Automatics
-local auto = Window:NewTab("Automatics")
-local asec = auto:NewSection("Auto Features")
-getgenv().AutoRaid, getgenv().KillAura, getgenv().AutoAwaken = false,false,false
-
-asec:NewToggle("Auto Raid", "Auto Vai Island raid", function(v)
-  getgenv().AutoRaid = v
-  spawn(function()
-    while getgenv().AutoRaid do task.wait(1)
-      local portal = workspace:FindFirstChild("RaidPortal") or workspace:FindFirstChild("DimensionalTeleport")
-      if portal then
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = portal.CFrame + Vector3.new(0,5,0)
-      end
-    end
-  end)
-end)
-
-asec:NewToggle("Kill Aura", "Auto attack mob in radius", function(v)
-  getgenv().KillAura = v
-  spawn(function()
-    while getgenv().KillAura do task.wait(0.1)
-      for _, mob in pairs(workspace.Enemies:GetChildren()) do
-        if mob:FindFirstChild("Humanoid") and mob.Humanoid.Health > 0 then
-          game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = mob.HumanoidRootPart.CFrame + Vector3.new(0,10,0)
-        end
-      end
-    end
-  end)
-end)
-
-asec:NewToggle("Auto Awakening", "Auto awaken skill every 1 min", function(v)
-  getgenv().AutoAwaken = v
-  spawn(function()
-    while getgenv().AutoAwaken do
-      task.wait(60)
-      pcall(function()
-        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("Awake")
-      end)
-    end
-  end)
-end)
-
--- 👥 Players Tab
-local players = Window:NewTab("Players")
-local psec = players:NewSection("Player Options")
-psec:NewTextBox("Set WalkSpeed", "Speed value", function(val)
-  game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = tonumber(val) or 16
-end)
-psec:NewTextBox("Set JumpPower", "Jump value", function(val)
-  game.Players.LocalPlayer.Character.Humanoid.JumpPower = tonumber(val) or 50
-end)
-
--- 🌍 Travel Tab
-local travel = Window:NewTab("Travel")
-local tsec = travel:NewSection("Teleports")
-local teleports = {
-  ["Spawn Island"] = CFrame.new(0,10,0),
-  ["Second Island"] = CFrame.new(500,20,500),
+-- Mỗi tab + các toggle
+local tabs = {
+    {name = "Auto Farm Level",     func = function(bool) _G.AutoFarmLevel = bool; end},
+    {name = "Auto Farm Boss",      func = function(bool) _G.AutoFarmBoss = bool; end},
+    {name = "Auto Chest",          func = function(bool) _G.AutoChest = bool; end},
+    {name = "Auto Bounty",         func = function(bool) _G.AutoBounty = bool; end},
+    {name = "ESP",                 func = function(bool) _G.ESP = bool; end},
+    {name = "Aimbot",             func = function(bool) _G.Aimbot = bool; end},
+    {name = "Auto Raid",          func = function(bool) _G.AutoRaid = bool; end},
+    {name = "Auto Fruit",         func = function(bool) _G.AutoFruit = bool; end},
+    {name = "Misc",               func = function(bool) _G.Misc = bool; end},
+    {name = "Settings",           func = function(bool) _G.Settings = bool; end},
 }
-for name,cframe in pairs(teleports) do
-  tsec:NewButton(name, "", function()
-    local hrp = game.Players.LocalPlayer.Character.HumanoidRootPart
-    hrp.CFrame = cframe
-  end)
+
+for _, tabData in ipairs(tabs) do
+    local Tab = Window:NewTab(tabData.name)
+    local Section = Tab:NewSection(tabData.name .. " Section")
+    Section:NewToggle("Enable " .. tabData.name, "Toggle " .. tabData.name, function(state)
+        tabData.func(state)
+        if state then
+            print(tabData.name .. " bật")
+            -- Chèn code chức năng ON tại đây
+        else
+            print(tabData.name .. " tắt")
+            -- Chèn code STOP chức năng OFF ở đây
+        end
+    end)
 end
 
--- 👑 Raid Tab (settings if needed)
-local raid = Window:NewTab("Raid")
-local rsec = raid:NewSection("Raid Settings")
-rsec:NewDropdown("Raid Island", "Select island", {"Ice","Waterfall","Hot"}, function(opt)
-  getgenv().RaidIsland = opt
-end)
+-- Kéo thả GUI đã có sẵn trong Kavo UI
 
--- 🛍️ Shops Tab
-local shops = Window:NewTab("Shops")
-local ssec = shops:NewSection("Shop Utils")
-ssec:NewButton("Open Devils Fruit Shop", "Teleport to shop", function()
-  local hrp = game.Players.LocalPlayer.Character.HumanoidRootPart
-  hrp.CFrame = CFrame.new(1000,10,1000)
-end)
-
--- 🔧 Misc Tab
-local misc = Window:NewTab("Misc")
-local miscsec = misc:NewSection("Miscellaneous")
-miscsec:NewToggle("Auto Fruit", "Auto collect fruit items", function(v)
-  getgenv().AutoFruit = v
-  spawn(function()
-    while getgenv().AutoFruit do task.wait(1)
-      for _, obj in pairs(workspace:GetDescendants()) do
-        if obj:IsA("Tool") and obj.Name:lower():find("fruit") then
-          game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = obj.Handle.CFrame + Vector3.new(0,2,0)
+-- Ví dụ: auto-farm đơn giản
+spawn(function()
+    while true do
+        wait(0.5)
+        if _G.AutoFarmLevel then
+            -- CODE auto farm level
         end
-      end
+        if _G.AutoFarmBoss then
+            -- CODE auto farm boss
+        end
+        -- và các chức năng khác...
     end
-  end)
-end)
-
-miscsec:NewToggle("ESP Players", "Show player names", function(v)
-  for _,plr in pairs(game.Players:GetPlayers()) do
-    if v and plr~=game.Players.LocalPlayer and plr.Character and plr.Character:FindFirstChild("Head") then
-      if not plr.Character.Head:FindFirstChild("ESP") then
-        local bill = Instance.new("BillboardGui",plr.Character.Head)
-        bill.Name="ESP"; bill.Size=UDim2.new(0,100,0,30); bill.AlwaysOnTop=true
-        local txt = Instance.new("TextLabel",bill)
-        txt.Text=plr.Name; txt.Size=UDim2.new(1,0,1,0); txt.BackgroundTransparency=1; txt.TextColor3=Color3.new(1,1,1)
-      end
-    elseif plr.Character and plr.Character:FindFirstChild("Head") and plr.Character.Head:FindFirstChild("ESP") then
-      plr.Character.Head.ESP:Destroy()
-    end
-  end
-end)
-
--- ⚙️ Settings Tab
-local sett = Window:NewTab("Settings")
-local s2 = sett:NewSection("UI")
-s2:NewKeybind("Toggle GUI", "Show/hide menu", Enum.KeyCode.RightControl, function()
-  Library:ToggleUI()
 end)
